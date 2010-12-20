@@ -1,5 +1,3 @@
-#summary One-sentence summary of this page.
-
 = Adding gwt-html5-video into your eclipse project =
 
 {{{
