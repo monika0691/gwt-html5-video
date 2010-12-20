@@ -1,0 +1,7 @@
+#summary One-sentence summary of this page.
+
+= Adding gwt-html5-video into your eclipse project =
+
+{{{
+<inherits name='fr.hd3d.html5.video.HTML5Video'/>
+}}}
