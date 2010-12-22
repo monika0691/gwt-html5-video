@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project name="HTML5 video" default="all">
+
+	<!-- ==================== File and Directory Names ===================== -->
+	<property name="buckminster.dir" value="../.buckminster/maven2" />
+	<property name="build.home" value="build" />
+	<property name="dist.home" value="dist" />
+	<property name="dist.archive" value="fr.hd3d.html5.video.jar" />
+
+	<property name="src.home" value="src" />
+	<property name="src.config" value="fr/hd3d/html5/video/HTML5Video.gwt.xml" />
+	<property name="src.client" value="fr/hd3d/html5/video/" />
+
+	<!-- ==================== All Target =================================== -->
+	<target name="all" description="Clean build and dist">
+		<antcall target="dist" />
+		<!--antcall target="test" /-->
+	</target>
+
+	<!-- ==================== Clean Target ================================= -->
+	<target name="clean" description="clean up">
+		<delete dir="${build.home}" />
+		<delete dir="${dist.home}" />
+	</target>
+
+	<!-- ==================== Libs ========================================= -->
+	<path id="project.libs">
+		<fileset dir="${buckminster.dir}">
+			<include name="com/google/gwt/gwt-dev/2.0.4/gwt-dev-2.0.4.jar" />
+			<include name="com/google/gwt/gwt-user/2.0.4/gwt-user-2.0.4.jar" />
+		</fileset>
+	</path>
+
+	<!-- ==================== Build Target ================================= -->
+	<target name="compile" depends="clean" description="compile the code">
+		<mkdir dir="${build.home}" />
+		<javac includeantruntime="false" srcdir="${src.home}" destdir="${build.home}">
+			<classpath refid="project.libs" />
+		</javac>
+
+		<!-- Code -->
+		<copy todir="${build.home}/${src.client}">
+			<fileset dir="${src.home}/${src.client}" />
+		</copy>
+	</target>
+
+	<!-- ==================== Dist Target ================================= -->
+	<target name="dist" depends="compile" description="generate the distribution">
+		<mkdir dir="${dist.home}" />
+		<jar jarfile="${dist.home}/${dist.archive}">
+			<fileset dir="${build.home}" />
+		</jar>
+	</target>
+
+</project>
