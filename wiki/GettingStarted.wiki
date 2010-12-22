@@ -3,8 +3,8 @@
 
 ==Adding gwt-html5-video to an (Eclipse) GWT Project==
 
-  # Download last version of the librairie [http://code.google.com/p/gwt-html5-video/downloads/list fr.hd3d.html5.video.<version>.jar]
-  # Add the librairy into your Eclipse GWT project
+  # Download last version of the library[http://code.google.com/p/gwt-html5-video/downloads/list fr.hd3d.html5.video.<version>.jar]
+  # Add the library into your Eclipse GWT project
   # Edit GWT module to include the following line
 
 {{{
