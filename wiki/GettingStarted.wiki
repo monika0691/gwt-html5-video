@@ -44,5 +44,3 @@ public class Html5VideoDemo implements EntryPoint {
     }
 }
 }}}
-
-Download demo project [http://code.google.com/p/gwt-html5-video/downloads/detail?name=VideoDemoProject.tar.gz&can=2&q= here]
