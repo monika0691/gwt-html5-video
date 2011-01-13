@@ -2,7 +2,9 @@ package fr.hd3d.html5.video.client.handlers;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public interface HasVideoHandlers {
+
+public interface HasVideoHandlers
+{
     HandlerRegistration addAbortHandler(VideoAbortHandler abortHandler);
 
     HandlerRegistration addCanPlayHandler(VideoCanPlayHandler canPlayHandler);

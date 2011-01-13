@@ -1,34 +1,46 @@
 package fr.hd3d.html5.video.client;
 
-public class VideoSource {
-    public enum VideoType {
-        MP4 {
+public class VideoSource
+{
+    public enum VideoType
+    {
+        MP4
+        {
             @Override
-            public String getType() {
+            public String getType()
+            {
                 return MP4_VIDEO_TYPE;
             }
         },
-        THREE_GPP {
+        THREE_GPP
+        {
             @Override
-            public String getType() {
+            public String getType()
+            {
                 return THREE_GPP_VIDEO_TYPE;
             }
         },
-        OGG {
+        OGG
+        {
             @Override
-            public String getType() {
+            public String getType()
+            {
                 return OGG_VIDEO_TYPE;
             }
         },
-        MKV {
+        MKV
+        {
             @Override
-            public String getType() {
+            public String getType()
+            {
                 return MKV_VIDEO_TYPE;
             }
         },
-        WEBM {
+        WEBM
+        {
             @Override
-            public String getType() {
+            public String getType()
+            {
                 return WEBM_VIDEO_TYPE;
             }
         };
@@ -45,23 +57,22 @@ public class VideoSource {
 
     /**
      * @param src
-     *            <b>the address</b> of the media resource (video, audio) to
-     *            show
+     *            <b>the address</b> of the media resource (video, audio) to show
      * @param videoType
-     *            {@link VideoType} that represent the type of the media
-     *            resource
+     *            {@link VideoType} that represent the type of the media resource
      */
-    public VideoSource(String src, VideoType videoType) {
+    public VideoSource(String src, VideoType videoType)
+    {
         this.src = src;
         this.videoType = videoType;
     }
 
     /**
      * @param src
-     *            <b>the address</b> of the media resource (video, audio) to
-     *            show
+     *            <b>the address</b> of the media resource (video, audio) to show
      */
-    public VideoSource(String src) {
+    public VideoSource(String src)
+    {
         super();
         this.src = src;
     }
@@ -69,14 +80,16 @@ public class VideoSource {
     /**
      * @return {@link VideoType} that represent the type of the media resource
      */
-    public VideoType getVideoType() {
+    public VideoType getVideoType()
+    {
         return videoType;
     }
 
     /**
      * @return <b>the address</b> of the media resource (video, audio) to show
      */
-    public String getSrc() {
+    public String getSrc()
+    {
         return src;
     }
 }
