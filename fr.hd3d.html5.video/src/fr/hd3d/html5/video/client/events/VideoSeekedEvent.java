@@ -4,26 +4,31 @@ import com.google.gwt.event.shared.GwtEvent;
 
 import fr.hd3d.html5.video.client.handlers.VideoSeekedHandler;
 
+
 /**
  * The seeking attribute changed to false.
  * 
  * @author michael.guiral
  * 
  */
-public class VideoSeekedEvent extends GwtEvent<VideoSeekedHandler> {
+public class VideoSeekedEvent extends GwtEvent<VideoSeekedHandler>
+{
     private static final Type<VideoSeekedHandler> TYPE = new Type<VideoSeekedHandler>();
 
-    public static Type<VideoSeekedHandler> getType() {
+    public static Type<VideoSeekedHandler> getType()
+    {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(VideoSeekedHandler handler) {
+    protected void dispatch(VideoSeekedHandler handler)
+    {
         handler.onSeeked(this);
     }
 
     @Override
-    public Type<VideoSeekedHandler> getAssociatedType() {
+    public Type<VideoSeekedHandler> getAssociatedType()
+    {
         return TYPE;
     }
 }
