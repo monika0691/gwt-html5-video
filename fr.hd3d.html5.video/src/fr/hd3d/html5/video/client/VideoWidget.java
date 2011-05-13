@@ -2,7 +2,6 @@ package fr.hd3d.html5.video.client;
 
 import java.util.List;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -67,10 +66,16 @@ import fr.hd3d.html5.video.client.handlers.VideoWaitingHandler;
  */
 public class VideoWidget extends Widget implements HasVideoHandlers
 {
-    private static final String UNSUPPORTED_VIDEO_TAG = "Sorry, your browser does not support the &lt;video&gt; element.";
+    // private static final String UNSUPPORTED_VIDEO_TAG =
+    // "Sorry, your browser does not support the &lt;video&gt; element.";
     private VideoElement videoElement;
-    private Element unsupportedElement;
+    // private Element unsupportedElement;
     private HandlerManager videoHandlerManager;
+
+    public enum TypeSupport
+    {
+        NO, PROBABLY, MAYBE;
+    }
 
     /**
      * Create a default video HTML tag <br/>
@@ -100,7 +105,7 @@ public class VideoWidget extends Widget implements HasVideoHandlers
         this.videoHandlerManager = new HandlerManager(this);
         setDefaultPlaybackRate(1);
         setElement(videoElement);
-        addUnsupportedMessage();
+        // addUnsupportedMessage();
         setAutoPlay(autoPlay);
         setControls(controls);
         setPoster(poster);
@@ -187,36 +192,46 @@ public class VideoWidget extends Widget implements HasVideoHandlers
     {
         for (VideoSource videoSource : sources)
         {
-            VideoSourceElement sourceElement = VideoSourceElement.as(DOM.createElement(VideoSourceElement.TAG));
-            if (videoSource.getSrc() == null)
-            {
-                throw new IllegalArgumentException("src must not be null");
-            }
-            sourceElement.setSrc(videoSource.getSrc());
-            if (videoSource.getVideoType() != null)
-            {
-                sourceElement.setType(videoSource.getVideoType().getType());
-            }
-            if (VideoType.WEBM.equals(videoSource.getVideoType()))
-            {
-                videoElement.insertAfter(sourceElement, unsupportedElement);
-            }
-            else
-            {
-                videoElement.appendChild(sourceElement);
-            }
+            addSource(videoSource);
         }
     }
 
-    /**
-     * Add a message that be show if the user agent can display HTML5 video tag
-     */
-    private void addUnsupportedMessage()
+    public void addSource(String src)
     {
-        unsupportedElement = DOM.createElement("p");
-        unsupportedElement.setInnerHTML(UNSUPPORTED_VIDEO_TAG);
-        videoElement.appendChild(unsupportedElement);
+        addSource(new VideoSource(src));
     }
+
+    public void addSource(VideoSource videoSource)
+    {
+        VideoSourceElement sourceElement = VideoSourceElement.as(DOM.createElement(VideoSourceElement.TAG));
+        if (videoSource.getSrc() == null)
+        {
+            throw new IllegalArgumentException("src must not be null");
+        }
+        sourceElement.setSrc(videoSource.getSrc());
+        if (videoSource.getVideoType() != null)
+        {
+            sourceElement.setType(videoSource.getVideoType().getType());
+        }
+        if (VideoType.WEBM.equals(videoSource.getVideoType()))
+        {
+            videoElement.insertFirst(sourceElement);
+        }
+        else
+        {
+            videoElement.appendChild(sourceElement);
+        }
+    }
+
+    // /**
+    // * Add a message that be show if the user agent can display HTML5 video tag
+    // */
+    // private void addUnsupportedMessage()
+    // {
+    // unsupportedElement = DOM.createElement("p");
+    // unsupportedElement.setInnerHTML(UNSUPPORTED_VIDEO_TAG);
+    // videoElement.appendChild(unsupportedElement);
+    // }
 
     /**
      * Switch the playback status between paused and played
@@ -381,6 +396,29 @@ public class VideoWidget extends Widget implements HasVideoHandlers
     public String getCurrentSrc()
     {
         return videoElement.getCurrentSrc();
+    }
+
+    /**
+     * Use this function to test if the media could be play by the video tag
+     * 
+     * @param videoType
+     *            the videoType to check
+     * @return <b>TypeSupport.NO</b> if videoType is a type that the user agent knows it cannot render <br/>
+     *         <b>TypeSupport.PROBABLY</b> if if the user agent is confident that the type represents a media resource that it
+     *         can render if used in with this audio or video element <br/>
+     *         <b>TypeSupport.MAYBE</b> otherwise
+     */
+    public TypeSupport canPlayType(String videoType)
+    {
+        String canPlayType = videoElement.canPlayType(videoType);
+        TypeSupport typeSupport = TypeSupport.NO;
+        try
+        {
+            typeSupport = TypeSupport.valueOf(canPlayType.toUpperCase());
+        }
+        catch (Exception e)
+        {}
+        return typeSupport;
     }
 
     /**
@@ -723,200 +761,266 @@ public class VideoWidget extends Widget implements HasVideoHandlers
      * JNI for event handlers
      */
     private final native void addAbortEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('abort', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoAbortEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'abort',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoAbortEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addCanPlayEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('canplay', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoCanPlayEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'canplay',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoCanPlayEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addCanPlayThroughEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('canplaythrough', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoCanPlayThroughEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'canplaythrough',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoCanPlayThroughEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addDurationChangeEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('durationchange', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoDurationChangeEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'durationchange',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoDurationChangeEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addEmptyEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('emptied', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoEmptyEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'emptied',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoEmptyEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addEndedEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('ended', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoEndedEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'ended',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoEndedEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addErrorEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('error', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoErrorEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'error',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoErrorEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addLoadDataEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('loadeddata', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoLoadDataEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'loadeddata',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoLoadDataEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addLoadMetadataEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('loadedmetadata', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoLoadMetadataEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'loadedmetadata',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoLoadMetadataEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addLoadStartEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('loadstart', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoLoadStartEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'loadstart',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoLoadStartEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addPauseEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('pause', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoPauseEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'pause',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoPauseEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addPlayEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('play', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoPlayEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'play',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoPlayEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addPlayingEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('playing', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoPlayingEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'playing',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoPlayingEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addProgressEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('progress', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoProgressEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'progress',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoProgressEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addRateChangeEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('ratechange', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoRateChangeEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'ratechange',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoRateChangeEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addSeekedEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('seeked', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoSeekedEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'seeked',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoSeekedEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addSeekingEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('seeking', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoSeekingEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'seeking',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoSeekingEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addStalledEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('stalled', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoStalledEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'stalled',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoStalledEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addSuspendEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('suspend', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoSuspendEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'suspend',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoSuspendEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addTimeUpdateEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('timeupdate', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoTimeUpdateEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'timeupdate',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoTimeUpdateEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addVolumeChangeEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('volumechange', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoVolumeChangeEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'volumechange',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoVolumeChangeEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 
     private final native void addWaitingEventHandler() /*-{
-              var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
-              var videoWidget = this;
-              videoElement.addEventListener('waiting', function(){
-                  var event = @fr.hd3d.html5.video.client.events.VideoWaitingEvent::new()();
-                  videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
-              }, true);
-          }-*/;
+		var videoElement = this.@fr.hd3d.html5.video.client.VideoWidget::videoElement;
+		var videoWidget = this;
+		videoElement
+				.addEventListener(
+						'waiting',
+						function() {
+							var event = @fr.hd3d.html5.video.client.events.VideoWaitingEvent::new()();
+							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
+						}, true);
+    }-*/;
 }
