@@ -76,6 +76,11 @@ public class VideoElement extends Element
               this.defaultPlaybackRate = playbackRate;
           }-*/;
 
+    public final native String canPlayType(String type)/*-{
+        return this.canPlayType(type);
+    }-*/;
+
+    
     /**
      * @return <li><b>the initial playback position</b>, that is, time to which the media resource was automatically
      *         seeked when it was loaded.</li> <br/>
