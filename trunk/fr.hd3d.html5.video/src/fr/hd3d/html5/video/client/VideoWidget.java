@@ -293,6 +293,7 @@ public class VideoWidget extends Widget implements HasVideoHandlers
      */
     public double getCurrentTime()
     {
+        Object object = videoElement.getCurrentTime();
         return videoElement.getCurrentTime();
     }
 
@@ -318,7 +319,7 @@ public class VideoWidget extends Widget implements HasVideoHandlers
         double duration = videoElement.getDuration();
         if (Double.isNaN(duration))
         {
-            throw new NumberFormatException("The video the duration isn't available");
+            throw new NumberFormatException("The video duration isn't available");
         }
         else if (Double.isInfinite(duration))
         {
@@ -995,7 +996,11 @@ public class VideoWidget extends Widget implements HasVideoHandlers
 				.addEventListener(
 						'timeupdate',
 						function() {
+						    var currentTime = videoElement.currentTime;
+						    var duration = videoElement.duration;
 							var event = @fr.hd3d.html5.video.client.events.VideoTimeUpdateEvent::new()();
+							event.@fr.hd3d.html5.video.client.events.VideoTimeUpdateEvent::setCurrentTime(D)(currentTime);
+							event.@fr.hd3d.html5.video.client.events.VideoTimeUpdateEvent::setDuration(D)(duration);
 							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
 						}, true);
     }-*/;
