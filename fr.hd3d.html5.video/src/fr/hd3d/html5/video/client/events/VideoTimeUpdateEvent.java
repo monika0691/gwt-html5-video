@@ -17,6 +17,30 @@ public class VideoTimeUpdateEvent extends DomEvent<VideoTimeUpdateHandler>
     private static final Type<VideoTimeUpdateHandler> TYPE = new Type<VideoTimeUpdateHandler>("timeupdate",
             new VideoTimeUpdateEvent());
 
+    private double currentTime;
+
+    private double duration;
+
+    public double getCurrentTime()
+    {
+        return currentTime;
+    }
+
+    public void setCurrentTime(double currentTime)
+    {
+        this.currentTime = currentTime;
+    }
+
+    public double getDuration()
+    {
+        return duration;
+    }
+
+    public void setDuration(double duration)
+    {
+        this.duration = duration;
+    }
+
     public static Type<VideoTimeUpdateHandler> getType()
     {
         return TYPE;
