@@ -4,7 +4,4 @@
   <artifactId>fr.hd3d.html5.video</artifactId>
   <packaging>pom</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <scm>
-  	<url>http://gwt-html5-video.googlecode.com/svn/trunk/fr.hd3d.html5.video</url>
-  </scm>
 </project>
