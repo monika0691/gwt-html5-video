@@ -1,0 +1,10 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.hd3d.html5.video</groupId>
+  <artifactId>fr.hd3d.html5.video</artifactId>
+  <packaging>pom</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <scm>
+  	<url>http://gwt-html5-video.googlecode.com/svn/trunk/fr.hd3d.html5.video</url>
+  </scm>
+</project>
