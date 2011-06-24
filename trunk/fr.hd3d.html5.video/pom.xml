@@ -2,6 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.hd3d.html5.video</groupId>
   <artifactId>fr.hd3d.html5.video</artifactId>
-  <packaging>java-source</packaging>
+  <packaging>pom</packaging>
   <version>0.0.1-SNAPSHOT</version>
 </project>
