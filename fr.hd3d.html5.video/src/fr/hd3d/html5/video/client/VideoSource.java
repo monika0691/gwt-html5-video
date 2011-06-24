@@ -92,4 +92,13 @@ public class VideoSource
     {
         return src;
     }
+    
+    public static VideoType getByType(String type) {
+    	for (VideoType videoType : VideoType.values()) {
+			if (videoType.getType().equalsIgnoreCase(type)) {
+				return videoType;
+			}
+		}
+    	return null;
+    }
 }
