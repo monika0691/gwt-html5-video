@@ -45,6 +45,15 @@ public class VideoSource
             }
         };
         public abstract String getType();
+
+		public static VideoType getByType(String type) {
+			for (VideoType videoType : VideoType.values()) {
+				if (videoType.getType().equalsIgnoreCase(type)) {
+					return videoType;
+				}
+			}
+			return null;
+		}
     }
 
     private static final String MP4_VIDEO_TYPE = "video/mp4";
