@@ -1028,4 +1028,14 @@ public class VideoWidget extends Widget implements HasVideoHandlers
 							videoWidget.@fr.hd3d.html5.video.client.VideoWidget::fireEvent(Ljava/lang/Object;)(event);
 						}, true);
     }-*/;
+    
+    public void load()
+    {
+        this.videoElement.load();
+    }
+
+    public void setSrc(String src)
+    {
+        this.videoElement.setSrc(src);
+    }
 }
